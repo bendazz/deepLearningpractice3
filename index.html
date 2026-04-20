@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning Practice Test &mdash; FFNs &amp; CNNs</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="styles.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false},
+      {left: '\\[', right: '\\]', display: true}
+    ]
+  });"></script>
+<script defer src="visibility.js"></script>
+<script defer src="script.js"></script>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html" class="active">FFNs &amp; CNNs</a>
+  <a href="transformers.html">Transformers</a>
+  <a href="fastapi.html">FastAPI</a>
+</nav>
+<header>
+  <h1>Deep Learning Practice Test</h1>
+  <p>FFNs &amp; CNNs. Try each question on paper first, then click <em>Show Answer</em> to check.</p>
+</header>
+
+<main id="questions">
+
+  <section class="question" data-key="ffn-1">
+    <div class="question-header">
+      <span class="question-number">Question 1</span>
+      <span class="question-type">fill in the blanks</span>
+    </div>
+    <div class="prompt">
+      <p>
+        You are building a feed-forward network in PyTorch to classify color (RGB)
+        images of size $40 \times 56$ pixels into 7 classes.
+        Fill in every blank (<span class="blank">&nbsp;</span>) so that the architecture is valid and appropriate for this task.
+      </p>
+<pre><code>model = nn.Sequential(
+    nn.Flatten(),
+    nn.Linear(<span class="blank">&nbsp;</span>, 256),
+    nn.ReLU(),
+    nn.Linear(<span class="blank">&nbsp;</span>, 64),
+    nn.ReLU(),
+    nn.Linear(<span class="blank">&nbsp;</span>, <span class="blank">&nbsp;</span>)
+)</code></pre>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>model = nn.Sequential(
+    nn.Flatten(),
+    nn.Linear(6720, 256),
+    nn.ReLU(),
+    nn.Linear(256, 64),
+    nn.ReLU(),
+    nn.Linear(64, 7)
+)</code></pre>
+      <p>
+        <strong>Reasoning:</strong>
+      </p>
+      <ul>
+        <li>Each image has shape (channels, height, width) $= (3, 40, 56)$. After <code>Flatten</code>, it becomes a vector of length $3 \times 40 \times 56 = 6720$, so the first <code>Linear</code> takes 6720 inputs.</li>
+        <li>The input dimension of each subsequent <code>Linear</code> must match the output dimension of the previous one: $256 \to 256$, then $64 \to 64$.</li>
+        <li>The final layer must output one score per class, so the output dimension is 7.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="ffn-2">
+    <div class="question-header">
+      <span class="question-number">Question 2</span>
+      <span class="question-type">fill in the blanks</span>
+    </div>
+    <div class="prompt">
+      <p>
+        You are now building a network with two convolutional layers (each followed by
+        a $2 \times 2$ max-pool) in the front, followed by a small feed-forward classifier.
+        The input is color (RGB) images of size $24 \times 36$ pixels, and there are 5 classes.
+        Every <code>Conv2d</code> uses a $3 \times 3$ kernel with <code>padding=1</code>,
+        so the convolutions do not change the spatial dimensions — only the pooling layers do.
+        Fill in every blank (<span class="blank">&nbsp;</span>).
+      </p>
+<pre><code>model = nn.Sequential(
+    nn.Conv2d(<span class="blank">&nbsp;</span>, 16, kernel_size=3, padding=1),
+    nn.ReLU(),
+    nn.MaxPool2d(2),
+    nn.Conv2d(<span class="blank">&nbsp;</span>, 32, kernel_size=3, padding=1),
+    nn.ReLU(),
+    nn.MaxPool2d(2),
+    nn.Flatten(),
+    nn.Linear(<span class="blank">&nbsp;</span>, 128),
+    nn.ReLU(),
+    nn.Linear(<span class="blank">&nbsp;</span>, <span class="blank">&nbsp;</span>)
+)</code></pre>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>model = nn.Sequential(
+    nn.Conv2d(3, 16, kernel_size=3, padding=1),
+    nn.ReLU(),
+    nn.MaxPool2d(2),
+    nn.Conv2d(16, 32, kernel_size=3, padding=1),
+    nn.ReLU(),
+    nn.MaxPool2d(2),
+    nn.Flatten(),
+    nn.Linear(1728, 128),
+    nn.ReLU(),
+    nn.Linear(128, 5)
+)</code></pre>
+      <p><strong>Reasoning:</strong> track the tensor shape at each step, written as (channels, height, width).</p>
+      <ul>
+        <li>Input image: $(3, 24, 36)$. So the first <code>Conv2d</code>'s <code>in_channels</code> is 3.</li>
+        <li>After the first <code>Conv2d</code> (padding preserves spatial dims): $(16, 24, 36)$.</li>
+        <li>After the first <code>MaxPool2d(2)</code>: $(16, 12, 18)$.</li>
+        <li>The second <code>Conv2d</code>'s <code>in_channels</code> must match the current channel count, which is 16.</li>
+        <li>After the second <code>Conv2d</code>: $(32, 12, 18)$.</li>
+        <li>After the second <code>MaxPool2d(2)</code>: $(32, 6, 9)$.</li>
+        <li>After <code>Flatten</code>, each sample is a vector of length $32 \times 6 \times 9 = 1728$, which is the input size of the first <code>Linear</code>.</li>
+        <li>The next <code>Linear</code>'s input must match the previous one's output (128), and its output must equal the number of classes, 5.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="ffn-3">
+    <div class="question-header">
+      <span class="question-number">Question 3</span>
+      <span class="question-type">short answer</span>
+    </div>
+    <div class="prompt">
+      <p>
+        An MNIST classifier is run on a batch of 4 images. Its output is the
+        following $4 \times 10$ matrix of scores, where row $i$ contains the
+        scores for sample $i$ and column $j$ is the score for digit class $j$
+        (so $j = 0, 1, 2, \ldots, 9$):
+      </p>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th></th>
+            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th>
+            <th>5</th><th>6</th><th>7</th><th>8</th><th>9</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th class="row-label">0</th><td>0.5</td><td>-1.2</td><td>0.3</td><td>4.1</td><td>-0.7</td><td>1.8</td><td>0.2</td><td>2.3</td><td>-0.4</td><td>0.9</td></tr>
+          <tr><th class="row-label">1</th><td>-0.3</td><td>1.5</td><td>0.4</td><td>-2.1</td><td>0.8</td><td>-1.4</td><td>2.0</td><td>5.6</td><td>1.1</td><td>0.6</td></tr>
+          <tr><th class="row-label">2</th><td>3.7</td><td>1.2</td><td>-0.5</td><td>0.8</td><td>-2.3</td><td>0.1</td><td>0.4</td><td>-1.0</td><td>2.8</td><td>0.9</td></tr>
+          <tr><th class="row-label">3</th><td>-1.1</td><td>0.2</td><td>-0.4</td><td>0.7</td><td>1.9</td><td>-0.8</td><td>0.5</td><td>2.4</td><td>1.0</td><td>3.6</td></tr>
+        </tbody>
+      </table>
+      <p>Write the prediction vector the network produces for this batch.</p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+      <p>Prediction vector: $[\,3,\ 7,\ 0,\ 9\,]$</p>
+      <p><strong>Reasoning:</strong> the predicted class for each sample is the column index of the largest score in that row ($\operatorname{argmax}$ along each row):</p>
+      <ul>
+        <li>Row 0: the maximum is $4.1$ at column 3 $\Rightarrow$ prediction 3.</li>
+        <li>Row 1: the maximum is $5.6$ at column 7 $\Rightarrow$ prediction 7.</li>
+        <li>Row 2: the maximum is $3.7$ at column 0 $\Rightarrow$ prediction 0.</li>
+        <li>Row 3: the maximum is $3.6$ at column 9 $\Rightarrow$ prediction 9.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="ffn-4">
+    <div class="question-header">
+      <span class="question-number">Question 4</span>
+      <span class="question-type">short answer</span>
+    </div>
+    <div class="prompt">
+      <p>
+        The same MNIST classifier is run on a batch of 6 images. Its output is
+        the $6 \times 10$ score matrix below (row $i$ is sample $i$, column $j$
+        is the score for digit $j$):
+      </p>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th></th>
+            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th>
+            <th>5</th><th>6</th><th>7</th><th>8</th><th>9</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th class="row-label">0</th><td>0.2</td><td>1.5</td><td>-0.3</td><td>0.8</td><td>3.9</td><td>0.1</td><td>-1.2</td><td>0.7</td><td>2.1</td><td>0.4</td></tr>
+          <tr><th class="row-label">1</th><td>2.8</td><td>-0.5</td><td>1.1</td><td>0.3</td><td>-1.8</td><td>0.9</td><td>4.2</td><td>0.6</td><td>-0.2</td><td>1.4</td></tr>
+          <tr><th class="row-label">2</th><td>-0.4</td><td>0.7</td><td>5.3</td><td>1.2</td><td>0.8</td><td>-1.1</td><td>0.3</td><td>2.0</td><td>0.5</td><td>-0.6</td></tr>
+          <tr><th class="row-label">3</th><td>1.0</td><td>0.4</td><td>-0.7</td><td>2.9</td><td>0.2</td><td>3.8</td><td>-0.3</td><td>0.6</td><td>1.5</td><td>0.1</td></tr>
+          <tr><th class="row-label">4</th><td>0.3</td><td>4.0</td><td>0.8</td><td>-0.2</td><td>1.6</td><td>0.5</td><td>2.1</td><td>-1.3</td><td>0.9</td><td>1.2</td></tr>
+          <tr><th class="row-label">5</th><td>0.6</td><td>-0.4</td><td>1.8</td><td>0.3</td><td>2.5</td><td>0.7</td><td>-1.0</td><td>3.4</td><td>0.9</td><td>1.1</td></tr>
+        </tbody>
+      </table>
+      <p>The true labels for these 6 samples are:</p>
+      <p>$\text{targets} = [\,4,\ 6,\ 8,\ 5,\ 1,\ 3\,]$</p>
+      <p>
+        Report the <strong>total accuracy</strong> on this batch — that is,
+        the number of correctly classified samples (a count, not a proportion).
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+      <p>Total accuracy = <strong>4</strong> correct out of 6.</p>
+      <p><strong>Reasoning:</strong> take the $\operatorname{argmax}$ of each row to get the prediction vector, then compare to the targets:</p>
+      <ul>
+        <li>Row 0: max $3.9$ at column 4 $\Rightarrow$ pred 4, target 4 &nbsp;&#10003;</li>
+        <li>Row 1: max $4.2$ at column 6 $\Rightarrow$ pred 6, target 6 &nbsp;&#10003;</li>
+        <li>Row 2: max $5.3$ at column 2 $\Rightarrow$ pred 2, target 8 &nbsp;&#10007;</li>
+        <li>Row 3: max $3.8$ at column 5 $\Rightarrow$ pred 5, target 5 &nbsp;&#10003;</li>
+        <li>Row 4: max $4.0$ at column 1 $\Rightarrow$ pred 1, target 1 &nbsp;&#10003;</li>
+        <li>Row 5: max $3.4$ at column 7 $\Rightarrow$ pred 7, target 3 &nbsp;&#10007;</li>
+      </ul>
+      <p>So predictions $= [4, 6, 2, 5, 1, 7]$ and 4 of them match the target vector.</p>
+    </div>
+  </section>
+
+  <section class="question" data-key="ffn-5">
+    <div class="question-header">
+      <span class="question-number">Question 5</span>
+      <span class="question-type">code from memory</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Assume the following have already been defined:
+      </p>
+      <ul>
+        <li><code>model</code> &mdash; a PyTorch neural network</li>
+        <li><code>loader</code> &mdash; a <code>DataLoader</code> that yields <code>(images, labels)</code> batches</li>
+        <li><code>criterion</code> &mdash; a loss function (e.g., <code>nn.CrossEntropyLoss()</code>)</li>
+        <li><code>optimizer</code> &mdash; an optimizer attached to <code>model.parameters()</code></li>
+        <li><code>epochs</code> &mdash; an integer number of training epochs</li>
+      </ul>
+      <p>
+        Write a PyTorch training loop that trains <code>model</code> for
+        <code>epochs</code> epochs. You do <strong>not</strong> need to track
+        loss or accuracy, evaluate on a test set, or print anything &mdash;
+        just the training itself.
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>for epoch in range(epochs):
+    for images, labels in loader:
+        optimizer.zero_grad()
+        output = model(images)
+        loss = criterion(output, labels)
+        loss.backward()
+        optimizer.step()</code></pre>
+      <p><strong>What each line does:</strong></p>
+      <ul>
+        <li><code>optimizer.zero_grad()</code>: clears gradients from the previous batch (PyTorch accumulates them by default).</li>
+        <li><code>output = model(images)</code>: forward pass &mdash; compute predictions for this batch.</li>
+        <li><code>loss = criterion(output, labels)</code>: compare predictions to true labels to get a scalar loss.</li>
+        <li><code>loss.backward()</code>: backpropagate &mdash; compute the gradient of the loss with respect to every parameter.</li>
+        <li><code>optimizer.step()</code>: update the parameters using those gradients.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>Good luck!</footer>
+</body>
+</html>

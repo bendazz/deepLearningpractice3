@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning Practice Test &mdash; Transformers</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="styles.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false},
+      {left: '\\[', right: '\\]', display: true}
+    ]
+  });"></script>
+<script defer src="visibility.js"></script>
+<script defer src="script.js"></script>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html">FFNs &amp; CNNs</a>
+  <a href="transformers.html" class="active">Transformers</a>
+  <a href="fastapi.html">FastAPI</a>
+</nav>
+<header>
+  <h1>Deep Learning Practice Test</h1>
+  <p>Transformers. Try each question on paper first, then click <em>Show Answer</em> to check.</p>
+</header>
+
+<main id="questions">
+
+  <section class="question" data-key="tx-1">
+    <div class="question-header">
+      <span class="question-number">Question 1</span>
+      <span class="question-type">short answer</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Consider the following tiny vocabulary, which maps each word to its
+        token ID:
+      </p>
+<pre><code>{
+  "the": 0,
+  "cat": 1,
+  "dog": 2,
+  "sat": 3,
+  "ran": 4,
+  "on":  5,
+  "mat": 6
+}</code></pre>
+      <p>
+        Using this vocabulary, encode the sentence
+      </p>
+      <p style="text-align: center;"><strong>"the cat sat on the mat"</strong></p>
+      <p>
+        as a sequence of token IDs.
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+      <p>Encoded sequence: $[\,0,\ 1,\ 3,\ 5,\ 0,\ 6\,]$</p>
+      <p><strong>Reasoning:</strong> replace each word with its ID from the vocabulary, in order:</p>
+      <ul>
+        <li>"the" &rarr; 0</li>
+        <li>"cat" &rarr; 1</li>
+        <li>"sat" &rarr; 3</li>
+        <li>"on" &rarr; 5</li>
+        <li>"the" &rarr; 0</li>
+        <li>"mat" &rarr; 6</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="tx-2">
+    <div class="question-header">
+      <span class="question-number">Question 2</span>
+      <span class="question-type">short answer</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Using the same vocabulary as Question 1, suppose we define a (toy,
+        not semantically meaningful) embedding that maps each token ID $i$
+        to a 2-dimensional vector by the formula
+      </p>
+      <p>$$ e(i) = (\,i + 1,\ 2i - 1\,). $$</p>
+      <p>
+        What is the embedded vector for the word <strong>"sat"</strong>?
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+      <p>$e(\text{"sat"}) = (4,\ 5)$</p>
+      <p><strong>Reasoning:</strong></p>
+      <ul>
+        <li>From the vocabulary, "sat" has token ID $i = 3$.</li>
+        <li>Plug into the formula: $e(3) = (3 + 1,\ 2 \cdot 3 - 1) = (4,\ 5)$.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="tx-3">
+    <div class="question-header">
+      <span class="question-number">Question 3</span>
+      <span class="question-type">short answer</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Using the same vocabulary and embedding formula as before
+        $$ e(i) = (\,i + 1,\ 2i - 1\,), $$
+        compute the <strong>embedding matrix</strong> for the sentence
+      </p>
+      <p style="text-align: center;"><strong>"dog sat on mat"</strong></p>
+      <p>
+        using the convention that each row of the matrix is the embedding of
+        one token (so the result has shape $T \times d$, where $T$ is the
+        number of tokens and $d$ is the embedding dimension).
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+      <p>The sentence has 4 tokens and the embedding dimension is 2, so the embedding matrix has shape $4 \times 2$:</p>
+      <p>
+        $$
+        X \;=\;
+        \begin{bmatrix}
+          3 & 3 \\
+          4 & 5 \\
+          6 & 9 \\
+          7 & 11
+        \end{bmatrix}
+        $$
+      </p>
+      <p><strong>Reasoning:</strong> look up each token's ID, apply the embedding formula, and stack the results as rows:</p>
+      <ul>
+        <li>"dog" &rarr; id 2 &rarr; $e(2) = (3,\ 3)$</li>
+        <li>"sat" &rarr; id 3 &rarr; $e(3) = (4,\ 5)$</li>
+        <li>"on" &rarr; id 5 &rarr; $e(5) = (6,\ 9)$</li>
+        <li>"mat" &rarr; id 6 &rarr; $e(6) = (7,\ 11)$</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="tx-4">
+    <div class="question-header">
+      <span class="question-number">Question 4</span>
+      <span class="question-type">code from memory</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Suppose you are given a vocabulary as a Python list of tokens. For
+        example, the vocabulary we've been using in the previous questions
+        corresponds to the list
+      </p>
+<pre><code>vocab = ["the", "cat", "dog", "sat", "ran", "on", "mat"]</code></pre>
+      <p>
+        Write a Python function that takes such a <code>vocab</code> list as
+        input and returns a dictionary mapping each token to its index in
+        the list.
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>def build_vocab_dict(vocab):
+    vocab_dictionary = {}
+    for i, token in enumerate(vocab):
+        vocab_dictionary[token] = i
+    return vocab_dictionary</code></pre>
+      <p><strong>Reasoning:</strong></p>
+      <ul>
+        <li><code>enumerate(vocab)</code> yields <code>(i, token)</code> pairs where <code>i</code> is the position of <code>token</code> in the list.</li>
+        <li>Inside the loop, we add an entry <code>token &rarr; i</code> to the dictionary.</li>
+        <li>After the loop, every token in the vocabulary has been mapped to its index, and we return the resulting dictionary.</li>
+      </ul>
+      <p>
+        For example, applied to the vocabulary above, calling
+        <code>build_vocab_dict(vocab)</code> would produce
+        <code>{"the": 0, "cat": 1, "dog": 2, "sat": 3, "ran": 4, "on": 5, "mat": 6}</code>,
+        which matches the token-ID mapping used in the earlier questions.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>Good luck!</footer>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning Practice Test &mdash; FastAPI</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="styles.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false},
+      {left: '\\[', right: '\\]', display: true}
+    ]
+  });"></script>
+<script defer src="visibility.js"></script>
+<script defer src="script.js"></script>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html">FFNs &amp; CNNs</a>
+  <a href="transformers.html">Transformers</a>
+  <a href="fastapi.html" class="active">FastAPI</a>
+</nav>
+<header>
+  <h1>Deep Learning Practice Test</h1>
+  <p>FastAPI. Try each question on paper first, then click <em>Show Answer</em> to check.</p>
+</header>
+
+<main id="questions">
+
+  <section class="question" data-key="api-1">
+    <div class="question-header">
+      <span class="question-number">Question 1</span>
+      <span class="question-type">code from memory</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Write a FastAPI <code>GET</code> endpoint that takes two integers as
+        input and returns a dictionary containing their sum and their product.
+      </p>
+      <p>
+        Assume the usual imports and that the FastAPI app has already been
+        created as <code>app</code>. Write just the endpoint function
+        (including its decorator).
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>@app.get("/compute")
+def compute(a: int, b: int):
+    return {"sum": a + b, "product": a * b}</code></pre>
+      <p><strong>Reasoning:</strong></p>
+      <ul>
+        <li><code>@app.get("/compute")</code> registers the function as a handler for <code>GET</code> requests at the path <code>/compute</code>.</li>
+        <li>Because <code>a</code> and <code>b</code> are typed as <code>int</code> and are <em>not</em> part of the path string, FastAPI treats them as query parameters.</li>
+        <li>Returning a Python <code>dict</code> causes FastAPI to serialize the response as JSON, e.g. <code>{"sum": 7, "product": 12}</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="api-2">
+    <div class="question-header">
+      <span class="question-number">Question 2</span>
+      <span class="question-type">short answer</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Suppose the FastAPI app from the previous question is running, and
+        call its base URL <code>homepage</code>. Write the full URL a client
+        would use to call the <code>/compute</code> endpoint with $a = 3$ and
+        $b = 4$, and state the JSON response the server would return.
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+      <p><strong>URL:</strong></p>
+<pre><code>homepage/compute?a=3&amp;b=4</code></pre>
+      <p><strong>JSON response:</strong></p>
+<pre><code>{"sum": 7, "product": 12}</code></pre>
+      <p><strong>Reasoning:</strong></p>
+      <ul>
+        <li>Query parameters are appended to the path after a <code>?</code>, with each parameter written as <code>name=value</code> and multiple parameters separated by <code>&amp;</code>.</li>
+        <li>So <code>a = 3</code> and <code>b = 4</code> become <code>?a=3&amp;b=4</code>.</li>
+        <li>The endpoint returns <code>{"sum": a + b, "product": a * b}</code>, which evaluates to <code>{"sum": 7, "product": 12}</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="api-3">
+    <div class="question-header">
+      <span class="question-number">Question 3</span>
+      <span class="question-type">code from memory</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Write a FastAPI <code>GET</code> endpoint that takes a string as
+        input and returns the encoding of that string as a list (of token
+        IDs). You may assume that a dictionary named
+        <code>vocab_dictionary</code>, mapping each token in the vocabulary
+        to its integer index, has already been defined.
+      </p>
+      <p>
+        Assume the usual imports and that the FastAPI app has already been
+        created as <code>app</code>. Write just the endpoint function
+        (including its decorator).
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>@app.get("/encode")
+def encode(s: str):
+    encoded = []
+    for c in s:
+        encoded.append(vocab_dictionary[c])
+    return encoded</code></pre>
+      <p><strong>Reasoning:</strong></p>
+      <ul>
+        <li><code>@app.get("/encode")</code> registers the function as a handler for <code>GET</code> requests at the path <code>/encode</code>.</li>
+        <li>Because <code>s</code> is typed as <code>str</code> and is not part of the path, FastAPI treats it as a query parameter.</li>
+        <li>Inside the function, we loop through each token <code>c</code> in the input string, look up its integer index in <code>vocab_dictionary</code>, and append it to the list <code>encoded</code>.</li>
+        <li>Returning a Python list causes FastAPI to serialize the response as a JSON array.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="api-4">
+    <div class="question-header">
+      <span class="question-number">Question 4</span>
+      <span class="question-type">code from memory</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Suppose the following have already been defined in the FastAPI app:
+      </p>
+<pre><code>vocab = ["the", "cat", "dog", "sat", "ran", "on", "mat"]
+embedding = nn.Embedding(7, 2)</code></pre>
+      <p>
+        Write a FastAPI <code>GET</code> endpoint that returns a dictionary
+        mapping each vocabulary index to its embedded vector (as a list of
+        two numbers).
+      </p>
+      <p>
+        Assume the usual imports (including <code>torch</code>) and that the
+        FastAPI app has been created as <code>app</code>. Write just the
+        endpoint function (including its decorator).
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>@app.get("/embeddings")
+def get_embeddings():
+    result = {}
+    for i in range(len(vocab)):
+        result[i] = embedding.weight[i].tolist()
+    return result</code></pre>
+      <p><strong>Reasoning:</strong></p>
+      <ul>
+        <li><code>@app.get("/embeddings")</code> registers the function as the handler for <code>GET /embeddings</code>. The endpoint takes no inputs.</li>
+        <li>The size of the vocabulary is <code>len(vocab)</code>, so we loop over indices <code>i = 0, 1, ..., len(vocab) - 1</code>.</li>
+        <li><code>embedding.weight</code> is a tensor of shape $(7, 2)$ holding the embedding table, so <code>embedding.weight[i]</code> is row $i$ &mdash; the 2-dimensional embedded vector for token $i$.</li>
+        <li><code>.tolist()</code> converts that tensor into a plain Python list so FastAPI can serialize it as JSON (PyTorch tensors are not JSON-serializable on their own).</li>
+        <li>Returning the dictionary produces a JSON object of the form <code>{"0": [x0, y0], "1": [x1, y1], ..., "6": [x6, y6]}</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="question" data-key="api-5">
+    <div class="question-header">
+      <span class="question-number">Question 5</span>
+      <span class="question-type">code from memory</span>
+    </div>
+    <div class="prompt">
+      <p>
+        Write a FastAPI <code>GET</code> endpoint that takes a string of text
+        as input and returns the embedding of that text as a list of lists
+        (one 2-dimensional vector per token).
+      </p>
+      <p>
+        You may assume that <code>vocab_dictionary</code> (mapping each token
+        to its index) and <code>embedding</code> (an <code>nn.Embedding</code>
+        layer) have already been defined, and that the usual imports
+        (including <code>torch</code>) are available.
+      </p>
+    </div>
+    <button class="reveal" onclick="toggleAnswer(this)">Show Answer</button>
+    <div class="answer">
+      <div class="answer-label">Answer</div>
+<pre><code>@app.get("/embed_text")
+def embed_text(s: str):
+    result = []
+    for c in s:
+        i = vocab_dictionary[c]
+        result.append(embedding.weight[i].tolist())
+    return result</code></pre>
+      <p><strong>Reasoning:</strong></p>
+      <ul>
+        <li><code>@app.get("/embed_text")</code> registers the function as the handler for <code>GET /embed_text</code>.</li>
+        <li>Because <code>s</code> is typed as <code>str</code> and is not part of the path, FastAPI treats it as a query parameter.</li>
+        <li>For each token <code>c</code> in the input string, we look up its index <code>i</code> in <code>vocab_dictionary</code>, grab the corresponding row of the embedding table with <code>embedding.weight[i]</code>, and convert that 2-D tensor to a list with <code>.tolist()</code>.</li>
+        <li>Appending each such 2-element list to <code>result</code> builds a list of lists whose shape is (length of text) $\times$ 2.</li>
+        <li>Returning a Python list of lists causes FastAPI to serialize the response as a JSON array of arrays.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>Good luck!</footer>
+</body>
+</html>
