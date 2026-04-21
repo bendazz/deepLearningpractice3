@@ -17,9 +17,9 @@ const VISIBLE_KEYS = [
   "tx-4",
 
   // FastAPI
-  //"api-1",
-  //"api-2",
-  //"api-3",
-  //"api-4",
-  //"api-5",
+  "api-1",
+  "api-2",
+  "api-3",
+  "api-4",
+  "api-5",
 ];
